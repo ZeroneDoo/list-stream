@@ -58,6 +58,7 @@
             navigator.clipboard.writeText(link)
             .then(() => {
                 console.log('Text copied to clipboard!')
+                alert('M3U link copied to clipboard!')
             })
             .catch(()=>{
                 console.error('Error copying text:', error)
@@ -74,7 +75,6 @@
                 var data = document.execCommand('copy')
                 console.log(data)
                 console.log('Text copied to clipboard!')
-                alert('M3U link copied to clipboard!')
             } catch (error) {
                 console.error('Unable to copy text:', error)
             } finally {
