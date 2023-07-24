@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>List Stream 48</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.24.0/axios.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Quicksand:wght@600&display=swap"
+        rel="stylesheet">
+    <script>
+        tailwind.config = {
+          theme: {
+            extend: {
+                colors: {
+                    'primary': '#CD0C0D',
+                },
+                fontFamily: {
+                    'nunito': ['Nunito, sans-serif'],
+                },
+            }
+          }
+        }
+    </script>
+    <style>
+        .card{
+            width: 100%;
+            display: flex;
+            gap: 10px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            padding: 8px;
+        }
+    </style>
+</head>
+<body class="font-nunito">
+    <div class="my-10 mx-auto flex w-fit items-center gap-7">
+        <div class="w-[70px]">
+            <img src="https://jkt48.com/images/logo.svg" alt="https://jkt48.com/images/logo.svg">
+        </div>
+        <div>
+
+        </div>
+        <div class="w-[180px]">
+            <img src="https://www.showroom-live.com/assets/svg/logo.svg" alt="https://www.showroom-live.com/assets/svg/logo.svg">
+        </div>
+    </div>
+    <div id="card-container" class="w-fit mx-auto grid grid-cols sm:grid-cols-2 gap-4">
+    </div>
+    <script src="api.js"></script>
+    <script>
+        function copyLink(link){
+            navigator.clipboard.writeText(link)
+            .then(() => {
+                console.log('Text copied to clipboard!')
+            })
+            .catch(()=>{
+                console.error('Error copying text:', error)
+            })
+
+            const input = document.createElement('input')
+            input.value = link
+            input.type = 'hidden'
+            document.body.appendChild(input)
+            
+            input.select()
+            
+            try {
+                var data = document.execCommand('copy')
+                console.log(data)
+                console.log('Text copied to clipboard!')
+                alert('M3U link copied to clipboard!')
+            } catch (error) {
+                console.error('Unable to copy text:', error)
+            } finally {
+                document.body.removeChild(input)
+            }
+        }
+        function createElement(data){
+            let date = new Date(data.started_at * 1000)
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+
+            const card = document.createElement('div')
+            card.className = "card flex flex-col sm:flex-row"
+
+            const img = document.createElement('img')
+            img.className = "image"
+            img.src = data.image
+            card.appendChild(img)
+
+            const detailWrapper = document.createElement('div')
+            detailWrapper.className = "card-detail flex flex-col justify-between"
+            card.appendChild(detailWrapper)
+
+            const titleWrapper = document.createElement("div")
+            detailWrapper.appendChild(titleWrapper)
+
+            const title = document.createElement('h2') 
+            title.innerHTML = data.main_name
+            title.className = "text-[19px] font-semibold"
+            titleWrapper.appendChild(title)
+
+            const started = document.createElement('h3')
+            started.innerHTML= `Started at ${hours}:${minutes}`
+            started.className = "text-[16px]"
+            titleWrapper.appendChild(started)
+
+            const numView = document.createElement('h3')
+            numView.innerHTML = `View num ${(data.view_num / 1000).toFixed(3)}`
+            started.className = "text-[16px]"
+            titleWrapper.appendChild(numView)
+
+            const btnWrapper = document.createElement('div') 
+            btnWrapper.className = 'flex justify-between sm:justify-start gap-4 mt-7 sm:mt-0'
+            detailWrapper.appendChild(btnWrapper)
+
+            const m3uLink = document.createElement('button')
+            m3uLink.className = "bg-red-400 transition-all hover:bg-primary font-semibold text-white text-[13px] px-3 py-2 rounded flex"
+            m3uLink.innerHTML = "Copy M3U link"
+            m3uLink.addEventListener('click', ()=>{
+                copyLink(data.streaming_url_list[0].url)
+            })
+            btnWrapper.appendChild(m3uLink)
+
+            const multiStream = document.createElement('a')
+            multiStream.className = "bg-red-400 transition-all hover:bg-primary font-semibold text-white text-[13px] px-3 py-2 rounded flex"
+            multiStream.innerHTML = "Visit website stream"
+            multiStream.href = "https://zeronedoo.github.io/multi-stream/"
+            multiStream.target = "_blank"
+            btnWrapper.appendChild(multiStream)
+
+            return { card, img, title }
+        }
+
+        async function initialize(){
+            const cardContainer = document.getElementById('card-container')
+            var response = await fetchData('https://jkt48-showroom-api.vercel.app/api/rooms/onlives')
+
+            if(response.data){
+                response.data.map((data)=>{
+                    var { card, img, title } = createElement(data)
+                    cardContainer.appendChild(card)
+                })
+            }
+        }
+        initialize()
+    </script>
+</body>
+</html>
